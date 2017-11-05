@@ -19,7 +19,7 @@ public class StarRaterEditor extends AbstractCellEditor implements TableCellEdit
     public StarRaterEditor(RatingsTableModel ratingsTableModel) {
 
         this.ratingsTableModel = ratingsTableModel;
-        starRater = new StarRater(5);
+        starRater = new StarRater(10);
         starRater.addStarListener(selection -> {
             ratingsTableModel.getMovie(row).setRating(Double.valueOf(selection));
         });

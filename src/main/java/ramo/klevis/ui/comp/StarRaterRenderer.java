@@ -17,7 +17,7 @@ public class StarRaterRenderer implements TableCellRenderer {
 
     public StarRaterRenderer(RatingsTableModel ratingsTableModel) {
         this.ratingsTableModel = ratingsTableModel;
-        starRater = new StarRater(5);
+        starRater = new StarRater(10);
 
     }
 

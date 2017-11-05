@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @author G. Cope
  */
 
-public class StringSearchable implements ramo.klevis.ui.comp.Searchable {
+public class BooksSearchable implements ramo.klevis.ui.comp.Searchable {
 
 
     private final Trie<Book> trie;
@@ -32,7 +32,7 @@ public class StringSearchable implements ramo.klevis.ui.comp.Searchable {
      * @param terms The inventory of terms to search.
      */
 
-    public StringSearchable(List<Book> terms, CollaborationFiltering collaborationFiltering) {
+    public BooksSearchable(List<Book> terms, CollaborationFiltering collaborationFiltering) {
         this.collaborationFiltering = collaborationFiltering;
         this.terms.addAll(terms);
         trie = new Trie();
@@ -52,7 +52,7 @@ public class StringSearchable implements ramo.klevis.ui.comp.Searchable {
         }
         List<Book> books = collaborationFiltering.predictBooks(wordsStartingWith);
 
-        return books.stream().map(e -> e.getTitle() + " - " + e.getRating().intValue()).collect(Collectors.toList());
+        return books.stream().filter(e -> e.getRating() != 0d).map(e -> e.getTitle() + " - " + e.getRating().intValue()).collect(Collectors.toList());
     }
 
 

@@ -37,8 +37,8 @@ public class UI {
     private final CollaborationFiltering collaborationFiltering;
     private JSpinner featureField;
     private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 14);
-    private final Font sansSerifItalic = new Font("SansSerif", Font.ITALIC, 13);
-    private StringSearchable searchable;
+    private final Font sansSerifItalic = new Font("SansSerif", Font.ITALIC, 14);
+    private BooksSearchable searchable;
     private JSpinner dataSizeField;
 
     public UI() throws Exception {
@@ -82,11 +82,11 @@ public class UI {
 
         GridLayout gridLayout = new GridLayout(2, 1);
         JPanel panelSuggestion = new JPanel(gridLayout);
-        JLabel label = new JLabel("Find Books Starting With(please rate and train first)");
+        JLabel label = new JLabel("Find Books Starting With(please rate books and train before)");
         label.setFont(sansSerifItalic);
         label.setForeground(Color.BLUE);
         panelSuggestion.add(label);
-        searchable = new StringSearchable(prepareData.getBooks(), collaborationFiltering);
+        searchable = new BooksSearchable(prepareData.getBooks(), collaborationFiltering);
         AutocompleteJComboBox combo = new AutocompleteJComboBox(searchable);
         panelSuggestion.add(combo);
         tableAndComboPanel.add(panelSuggestion, BorderLayout.NORTH);
@@ -104,6 +104,17 @@ public class UI {
     private void addTopPanel() throws IOException {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JButton reset = new JButton("Reset with Data Size");
+        reset.addActionListener(e -> {
+            resetBooksRate();
+        });
+        reset.setFont(sansSerifBold);
+        topPanel.add(reset);
+        SpinnerModel model = new SpinnerNumberModel(DATA_SIZE, 100000, 2700000, 5000);
+        dataSizeField = new JSpinner(model);
+        dataSizeField.setFont(sansSerifBold);
+        topPanel.add(dataSizeField);
+
         JButton train = new JButton("Train Algorithm with");
         train.setFont(sansSerifBold);
         train.addActionListener(e -> {
@@ -127,22 +138,10 @@ public class UI {
         JLabel genreSize = new JLabel("Genres size");
         genreSize.setFont(sansSerifBold);
         topPanel.add(genreSize);
-        SpinnerModel model = new SpinnerNumberModel(FEATURE_SIZE, 10, 150, 5);
+        model = new SpinnerNumberModel(FEATURE_SIZE, 10, 150, 5);
         featureField = new JSpinner(model);
         featureField.setFont(sansSerifBold);
         topPanel.add(featureField);
-
-
-        JButton reset = new JButton("Reset with Data Size");
-        reset.addActionListener(e -> {
-            resetBooksRate();
-        });
-        reset.setFont(sansSerifBold);
-        topPanel.add(reset);
-        model = new SpinnerNumberModel(DATA_SIZE, 100000, 2700000, 5000);
-        dataSizeField = new JSpinner(model);
-        dataSizeField.setFont(sansSerifBold);
-        topPanel.add(dataSizeField);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
     }
