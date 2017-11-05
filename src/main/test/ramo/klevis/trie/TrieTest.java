@@ -3,6 +3,7 @@ package ramo.klevis.trie;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertThat;
@@ -38,6 +39,25 @@ public class TrieTest {
         trie.insert("ten");
         trie.insert("great");
         assertThat(print(trie.getRoot()), Is.is("ROOT t(e(d n ))g(r(e(a(t ))))"));
+    }
+
+    @Test
+    public void shouldReturnSuggestionListWhenSearchWithPrefix() {
+        //http://ramok.tech
+        Trie trie = new Trie();
+        trie.insert("ted");
+        trie.insert("ten");
+        trie.insert("teddy");
+        trie.insert("great");
+        trie.insert("movie");
+        trie.insert("moon");
+
+        List<String> words=trie.findWordsStartingWith("te");
+
+        assertThat(words.get(0),Is.is("ted"));
+        assertThat(words.get(1),Is.is("ten"));
+        assertThat(words.get(2),Is.is("teddy"));
+        assertThat(words.size(),Is.is(3));
     }
 
     private String print(Root root) {

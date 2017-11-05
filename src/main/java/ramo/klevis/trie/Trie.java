@@ -1,6 +1,7 @@
 package ramo.klevis.trie;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by klevis.ramo on 11/5/2017.
@@ -18,12 +19,13 @@ public class Trie {
         char[] chars = word.toCharArray();
         Node startFrom = root;
         for (char aChar : chars) {
-            Node found = insert(aChar, startFrom);
+            Node found = insert(aChar, startFrom, word);
             startFrom = found;
+            startFrom.addWord(word);
         }
     }
 
-    private Node insert(char currentChar, Node startFrom) {
+    private Node insert(char currentChar, Node startFrom, String word) {
         Node node = startFrom.getChildren().get(currentChar);
         if (node == null) {
             Node newNode = new Node(currentChar);
@@ -33,4 +35,17 @@ public class Trie {
         return node;
     }
 
+    public List<String> findWordsStartingWith(String prefix) {
+
+        char[] chars = prefix.toCharArray();
+        Node current=root;
+        for (char currentChar : chars) {
+            Node node = current.getChildren().get(currentChar);
+            if (node == null) {
+                return new ArrayList<>();
+            }
+            current = node;
+        }
+        return current.getWords();
+    }
 }
