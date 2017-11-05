@@ -1,6 +1,6 @@
 package ramo.klevis.ui;
 
-import ramo.klevis.ml.Movie;
+import ramo.klevis.ml.Book;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -8,11 +8,11 @@ import java.util.List;
 
 public class RatingsTableModel extends AbstractTableModel {
 
-    private List<Movie> movieList=new ArrayList<>();
+    private List<Book> bookList =new ArrayList<>();
 
     @Override
     public int getRowCount() {
-        return movieList.size();
+        return bookList.size();
     }
 
     @Override
@@ -48,29 +48,29 @@ public class RatingsTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Movie movie = movieList.get(rowIndex);
+        Book book = bookList.get(rowIndex);
         Object value = null;
         switch (columnIndex) {
             case 0:
-                value = movie.getTitle();
+                value = book.getTitle();
                 break;
             case 1:
-                value = movie.getRating();
+                value = book.getRating();
                 break;
         }
         return value;
     }
 
-    public void restAndAddNewMovies(List<Movie> newMovies) {
-        movieList.clear();
-        movieList.addAll(newMovies);
+    public void restAndAddNewMovies(List<Book> newBooks) {
+        bookList.clear();
+        bookList.addAll(newBooks);
     }
 
-    public Movie getMovie(int row) {
-       return movieList.get(row);
+    public Book getMovie(int row) {
+       return bookList.get(row);
     }
 
-    public List<Movie> getMovieList() {
-        return movieList;
+    public List<Book> getBookList() {
+        return bookList;
     }
 }

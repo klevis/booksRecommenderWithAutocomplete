@@ -7,17 +7,13 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.recommendation.ALS;
 import org.apache.spark.mllib.recommendation.MatrixFactorizationModel;
 import org.apache.spark.mllib.recommendation.Rating;
-import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.catalyst.expressions.In;
 import scala.Tuple2;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by klevis.ramo on 10/29/2017.
@@ -28,14 +24,14 @@ public class CollaborationFiltering {
     private JavaSparkContext sparkContext;
     private double mse;
 
-    public List<Movie> train(List<Movie> currentMovies, int featureSize) throws Exception {
+    public List<Book> train(List<Book> currentBooks, int featureSize) throws Exception {
         if (sparkContext == null) {
             sparkContext = createSparkContext();
         }
         PrepareData prepareData = new PrepareData();
         List<Rating> ratingsList = prepareData.getRatings();
-        List<Rating> ratedByCurrentUser = currentMovies.stream().parallel().filter(e -> e.getRating() > 0d).map(e ->
-                new Rating(CURRENT_USER_ID, Integer.parseInt(e.getId()), e.getRating())).collect(Collectors.toList());
+        List<Rating> ratedByCurrentUser = currentBooks.stream().parallel().filter(e -> e.getRating() > 0d).map(e ->
+                new Rating(CURRENT_USER_ID, e.getId(), e.getRating())).collect(Collectors.toList());
         ratingsList.addAll(ratedByCurrentUser);
 
         JavaRDD<Rating> ratings = sparkContext.parallelize(ratingsList);
@@ -60,19 +56,19 @@ public class CollaborationFiltering {
         }).mean();
         System.out.println("Mean Squared Error = " + mse);
 
-        List<Movie> notRatedMovies = currentMovies.stream().parallel().filter(e -> e.getRating() == 0d).collect(Collectors.toList());
+        List<Book> notRatedBooks = currentBooks.stream().parallel().filter(e -> e.getRating() == 0d).collect(Collectors.toList());
 
-        JavaRDD<Tuple2<Object, Object>> map = sparkContext.parallelize(notRatedMovies).map(r -> new Tuple2<>(CURRENT_USER_ID, Integer.parseInt(r.getId())));
+        JavaRDD<Tuple2<Object, Object>> map = sparkContext.parallelize(notRatedBooks).map(r -> new Tuple2<>(CURRENT_USER_ID, r.getId()));
         List<Rating> predicted = model.predict(JavaRDD.toRDD(map)).toJavaRDD().collect().stream().parallel().sorted(Comparator.comparing(Rating::rating).reversed()).collect(Collectors.toList());
 
-        Map<String, Movie> notRatedMoviesMap = notRatedMovies.stream().parallel().collect(Collectors.toMap(Movie::getId, movie -> movie));
+        Map<Integer, Book> notRatedMoviesMap = notRatedBooks.stream().parallel().collect(Collectors.toMap(Book::getId, movie -> movie));
 
-        List<Movie> topTen = new ArrayList<>();
+        List<Book> topTen = new ArrayList<>();
         for (int i = 0; i < 30 && !predicted.isEmpty(); i++) {
 
-            Movie movie = notRatedMoviesMap.get("" + predicted.get(i).product());
-            movie.setRating(predicted.get(i).rating());
-            topTen.add(movie);
+            Book book = notRatedMoviesMap.get("" + predicted.get(i).product());
+            book.setRating(predicted.get(i).rating());
+            topTen.add(book);
         }
 
         return topTen;
@@ -80,7 +76,7 @@ public class CollaborationFiltering {
     }
 
     private JavaSparkContext createSparkContext() {
-        SparkConf conf = new SparkConf().setAppName("Movie Recomender").setMaster("local[*]");
+        SparkConf conf = new SparkConf().setAppName("Book Recomender").setMaster("local[*]");
         return new JavaSparkContext(conf);
     }
 

@@ -1,7 +1,7 @@
 package ramo.klevis.ui;
 
+import ramo.klevis.ml.Book;
 import ramo.klevis.ml.CollaborationFiltering;
-import ramo.klevis.ml.Movie;
 import ramo.klevis.ml.PrepareData;
 import ramo.klevis.ui.comp.StarRaterEditor;
 import ramo.klevis.ui.comp.StarRaterRenderer;
@@ -35,11 +35,9 @@ public class UI {
     private RatingsTableModel ratingsTableModel;
     private JTable table;
     private final CollaborationFiltering collaborationFiltering;
-    private SuggestionTableModel suggestionTableModel;
     private JSpinner featureField;
     private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 14);
     private final Font sansSerifItalic = new Font("SansSerif", Font.ITALIC, 13);
-    private JScrollPane suggestedScrollPane;
 
     public UI() throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -69,22 +67,20 @@ public class UI {
         table = new JTable(ratingsTableModel);
         table.getTableHeader().setFont(sansSerifBold);
         table.getColumnModel().getColumn(0).setPreferredWidth(190);
-        GridLayout gridLayout = new GridLayout(1, 2);
-        JPanel tablePanel = new JPanel(gridLayout);
+        GridLayout gridLayout = new GridLayout(2, 1);
+        JPanel tablePanel = new JPanel(new BorderLayout());
 
         JScrollPane ratingScrollPane = new JScrollPane(table);
         setPanelTitle(ratingScrollPane, "Tell the Algorithm What you like");
-        tablePanel.add(ratingScrollPane);
+        tablePanel.add(ratingScrollPane,BorderLayout.CENTER);
 
-        suggestionTableModel = new SuggestionTableModel();
-        JTable suggestedTable = new JTable(suggestionTableModel);
-        suggestedTable.getColumnModel().getColumn(2).setPreferredWidth(25);
-        suggestedTable.getTableHeader().setFont(sansSerifBold);
-        suggestedScrollPane = new JScrollPane(suggestedTable);
-        String title = "Suggested Movies by Algorithm";
-        setPanelTitle(suggestedScrollPane, title);
-        tablePanel.add(ratingScrollPane);
-        tablePanel.add(suggestedScrollPane);
+        List<Book> bookList = prepareData.getBooks();
+        ratingsTableModel.restAndAddNewMovies(bookList);
+        ratingsTableModel.fireTableDataChanged();
+        TableColumn col = table.getColumnModel().getColumn(1);
+        col.setCellEditor(new StarRaterEditor(ratingsTableModel));
+        col.setCellRenderer(new StarRaterRenderer(ratingsTableModel));
+
         mainPanel.add(tablePanel, BorderLayout.CENTER);
     }
 
@@ -101,19 +97,7 @@ public class UI {
         JLabel genres = new JLabel("Genres");
         genres.setFont(sansSerifBold);
         topPanel.add(genres);
-        JComboBox<String> jComboBox = new JComboBox<>();
-        Collection<String> allGenres = prepareData.getAllGenres();
-        allGenres.stream().forEach(e -> jComboBox.addItem(e));
-        jComboBox.addItemListener(e -> {
-            int stateChange = e.getStateChange();
-            if (stateChange == 1) {
-                loadMovieByGenre(e);
-            }
-        });
-        jComboBox.setFont(sansSerifBold);
-        topPanel.add(jComboBox);
-        jComboBox.setSelectedIndex(1);
-        jComboBox.setSelectedIndex(0);
+
         JButton reset = new JButton("Reset Ratings");
         reset.addActionListener(e -> {
             resetMoviesRate();
@@ -125,11 +109,7 @@ public class UI {
             showProgressBar();
             Runnable runnable = () -> {
                 try {
-                    List<Movie> topTenRated = collaborationFiltering.train(prepareData.getMovies(), (Integer) featureField.getValue());
-                    suggestionTableModel.restAndAddNewMovies(topTenRated);
-                    suggestionTableModel.fireTableDataChanged();
-                    setPanelTitle(suggestedScrollPane, "Suggested Movies, Error Prediction " + collaborationFiltering.getMse());
-                    suggestedScrollPane.updateUI();
+                    List<Book> topTenRated = collaborationFiltering.train(prepareData.getBooks(), (Integer) featureField.getValue());
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 } finally {
@@ -162,19 +142,9 @@ public class UI {
         ratingsTableModel.fireTableDataChanged();
     }
 
-    private void loadMovieByGenre(ItemEvent e) {
-        String genre = (String) e.getItem();
-        List<Movie> moviesList = prepareData.getMoviesByGenre(genre);
-        ratingsTableModel.restAndAddNewMovies(moviesList);
-        ratingsTableModel.fireTableDataChanged();
-        TableColumn col = table.getColumnModel().getColumn(1);
-        col.setCellEditor(new StarRaterEditor(ratingsTableModel));
-        col.setCellRenderer(new StarRaterRenderer(ratingsTableModel));
-    }
-
     private JFrame createMainFrame() {
         JFrame mainFrame = new JFrame();
-        mainFrame.setTitle("Movie Recommender");
+        mainFrame.setTitle("Book Recommender");
         mainFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         mainFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         mainFrame.setLocationRelativeTo(null);

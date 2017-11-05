@@ -1,6 +1,6 @@
 package ramo.klevis.ui.comp;
 
-import ramo.klevis.ml.Movie;
+import ramo.klevis.ml.Book;
 import ramo.klevis.ui.RatingsTableModel;
 
 import javax.swing.*;
@@ -33,9 +33,9 @@ public class StarRaterEditor extends AbstractCellEditor implements TableCellEdit
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        Movie currentMovie = ratingsTableModel.getMovie(row);
+        Book currentBook = ratingsTableModel.getMovie(row);
         float rating = starRater.getRating();
-        currentMovie.setRating(new Double(rating));
+        currentBook.setRating(new Double(rating));
         this.row = row;
         return starRater;
     }
