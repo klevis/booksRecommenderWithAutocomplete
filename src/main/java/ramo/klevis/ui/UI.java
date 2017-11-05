@@ -6,7 +6,6 @@ import ramo.klevis.ml.PrepareData;
 import ramo.klevis.ui.comp.AutocompleteJComboBox;
 import ramo.klevis.ui.comp.StarRaterEditor;
 import ramo.klevis.ui.comp.StarRaterRenderer;
-import ramo.klevis.ui.comp.StringSearchable;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

@@ -1,7 +1,6 @@
 package ramo.klevis.ui;
 
 import ramo.klevis.ui.comp.AutocompleteJComboBox;
-import ramo.klevis.ui.comp.StringSearchable;
 
 import java.util.List;
 

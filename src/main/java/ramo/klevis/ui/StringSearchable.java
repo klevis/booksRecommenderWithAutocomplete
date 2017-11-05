@@ -1,4 +1,6 @@
-package ramo.klevis.ui.comp;
+package ramo.klevis.ui;
+
+import ramo.klevis.trie.Trie;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,10 +16,11 @@ import java.util.List;
  * @author G. Cope
  */
 
-public class StringSearchable implements Searchable<String, String> {
+public class StringSearchable implements ramo.klevis.ui.comp.Searchable<String, String> {
 
 
     private List<String> terms = new ArrayList<String>();
+    private final Trie trie;
 
 
     /**
@@ -29,28 +32,15 @@ public class StringSearchable implements Searchable<String, String> {
     public StringSearchable(List<String> terms) {
 
         this.terms.addAll(terms);
+        trie = new Trie();
+        terms.stream().parallel().forEach(e -> trie.insert(e.toLowerCase()));
 
     }
 
 
     @Override
     public Collection<String> search(String value) {
-
-        List<String> founds = new ArrayList<String>();
-
-
-        for (String s : terms) {
-
-            if (s.indexOf(value) == 0) {
-
-                founds.add(s);
-
-            }
-
-        }
-
-        return founds;
-
+        return trie.findWordsStartingWith(value.toLowerCase());
     }
 
 
