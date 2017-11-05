@@ -41,9 +41,9 @@ public class PrepareData {
         return Files.readAllLines(getPath(ML_LATEST_SMALL_MOVIES_CSV), StandardCharsets.ISO_8859_1)
                 .stream().parallel().skip(1).map(line -> {
                     String[] values = line.split(";");
-                    int id = 0;
+                    int id;
                     try {
-                        id = Integer.parseInt(values[0].replaceAll("\"", ""));
+                        id = Integer.parseInt(values[0].replaceAll("\"", "").replaceAll("X", "9").replaceAll("x", "8"));
                     } catch (NumberFormatException e) {
                         return null;
                     }
@@ -59,7 +59,7 @@ public class PrepareData {
 
                     int product;
                     try {
-                        product = Integer.parseInt(values[1].replaceAll("\"", ""));
+                        product = Integer.parseInt(values[1].replaceAll("\"", "").replaceAll("X", "9").replaceAll("x", "8"));
                     } catch (NumberFormatException e) {
                         count[0]++;
                         return null;
