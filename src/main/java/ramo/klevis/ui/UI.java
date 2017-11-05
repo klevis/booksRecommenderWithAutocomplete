@@ -3,8 +3,10 @@ package ramo.klevis.ui;
 import ramo.klevis.ml.Book;
 import ramo.klevis.ml.CollaborationFiltering;
 import ramo.klevis.ml.PrepareData;
+import ramo.klevis.ui.comp.AutocompleteJComboBox;
 import ramo.klevis.ui.comp.StarRaterEditor;
 import ramo.klevis.ui.comp.StarRaterRenderer;
+import ramo.klevis.ui.comp.StringSearchable;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -12,13 +14,13 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 
-import java.awt.event.ItemEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by klevis.ramo on 10/29/2017.
@@ -49,7 +51,7 @@ public class UI {
         collaborationFiltering = new CollaborationFiltering();
     }
 
-    private void initUI() throws IOException {
+    private void initUI() throws Exception {
         mainFrame = createMainFrame();
         mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
@@ -62,26 +64,35 @@ public class UI {
         mainFrame.setVisible(true);
     }
 
-    private void addMovieTables() {
+    private void addMovieTables() throws InvocationTargetException, InterruptedException {
+        List<Book> bookList = prepareData.getBooks();
         ratingsTableModel = new RatingsTableModel();
         table = new JTable(ratingsTableModel);
         table.getTableHeader().setFont(sansSerifBold);
         table.getColumnModel().getColumn(0).setPreferredWidth(190);
-        GridLayout gridLayout = new GridLayout(2, 1);
-        JPanel tablePanel = new JPanel(new BorderLayout());
-
-        JScrollPane ratingScrollPane = new JScrollPane(table);
-        setPanelTitle(ratingScrollPane, "Tell the Algorithm What you like");
-        tablePanel.add(ratingScrollPane,BorderLayout.CENTER);
-
-        List<Book> bookList = prepareData.getBooks();
-        ratingsTableModel.restAndAddNewMovies(bookList);
-        ratingsTableModel.fireTableDataChanged();
         TableColumn col = table.getColumnModel().getColumn(1);
         col.setCellEditor(new StarRaterEditor(ratingsTableModel));
         col.setCellRenderer(new StarRaterRenderer(ratingsTableModel));
+        JPanel tableAndComboPanel = new JPanel(new BorderLayout());
+        JScrollPane ratingScrollPane = new JScrollPane(table);
+        setPanelTitle(ratingScrollPane, "Tell the Algorithm What you like");
+        tableAndComboPanel.add(ratingScrollPane, BorderLayout.CENTER);
 
-        mainPanel.add(tablePanel, BorderLayout.CENTER);
+        ratingsTableModel.restAndAddNewMovies(bookList);
+        ratingsTableModel.fireTableDataChanged();
+
+        GridLayout gridLayout = new GridLayout(2, 1);
+        JPanel panelSuggestion = new JPanel(gridLayout);
+        JLabel label = new JLabel("Find Books Starting With");
+        label.setFont(sansSerifBold);
+        panelSuggestion.add(label);
+        StringSearchable searchable = new StringSearchable(prepareData.getBooks().stream().limit(1000).map(e->e.getTitle()).collect(Collectors.toList()));
+        AutocompleteJComboBox combo = new AutocompleteJComboBox(searchable);
+        panelSuggestion.add(combo);
+        tableAndComboPanel.add(panelSuggestion, BorderLayout.NORTH);
+        mainPanel.add(tableAndComboPanel, BorderLayout.CENTER);
+
+
     }
 
     private void setPanelTitle(JScrollPane suggestedScrollPane, String title) {

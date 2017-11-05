@@ -3,6 +3,7 @@ package ramo.klevis;
 import ramo.klevis.ui.UI;
 import ramo.klevis.ui.comp.StarRater;
 
+import javax.swing.*;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -14,7 +15,13 @@ import java.util.Map;
 public class Run {
     public static void main(String[] args) throws Exception {
         setHadoopHomeEnvironmentVariable();
-        new UI();
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                new UI();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
 

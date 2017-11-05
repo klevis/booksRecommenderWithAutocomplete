@@ -40,4 +40,8 @@ public class Book implements Serializable{
         this.title = title;
     }
 
+    @Override
+    public String toString() {
+        return title;
+    }
 }
