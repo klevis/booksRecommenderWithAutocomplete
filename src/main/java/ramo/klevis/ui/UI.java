@@ -106,7 +106,17 @@ public class UI {
         topPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         JButton reset = new JButton("Reset with Data Size");
         reset.addActionListener(e -> {
-            resetBooksRate();
+            showProgressBar();
+            Runnable runnable = () -> {
+                try {
+                    resetBooksRate();
+                } finally {
+                    progressBar.setVisible(false);
+                }
+            };
+            Thread thread = new Thread(runnable);
+            thread.setDaemon(true);
+            thread.start();
         });
         reset.setFont(sansSerifBold);
         topPanel.add(reset);
