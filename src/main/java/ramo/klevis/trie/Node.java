@@ -1,6 +1,7 @@
 package ramo.klevis.trie;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ public class Node<T> {
     //keep order is easier to test
     private Map<Character, Node> children = new LinkedHashMap<>();
 
-    List<T> suggestionObject = new ArrayList<>();
+    Map<T, T> suggestionObject = new HashMap<T, T>();
 
     public Node() {
     }
@@ -38,10 +39,12 @@ public class Node<T> {
     }
 
     public List<T> getSuggestionObject() {
-        return new ArrayList<>(suggestionObject);
+        return new ArrayList<>(suggestionObject.values());
     }
 
     public void addSuggestionObject(T word) {
-        suggestionObject.add(word);
+        if (!suggestionObject.containsKey(word)) {
+            suggestionObject.put(word, word);
+        }
     }
 }

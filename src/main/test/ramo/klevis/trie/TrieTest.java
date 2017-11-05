@@ -77,6 +77,17 @@ public class TrieTest {
         assertThat(words.size(),Is.is(3));
     }
 
+    @Test
+    public void shouldSearchEachWordOnSentenceAndNotSuggestDuplicates() {
+        Trie trie = new Trie();
+        trie.insert("bla ted bla ted");
+
+        List<String> words=trie.findWordsStartingWith("te");
+        assertThat(words.size(),Is.is(1));
+        assertThat(words.get(0),Is.is("bla ted bla ted"));
+    }
+
+
     private String print(Root root) {
         StringBuilder stringBuilder = new StringBuilder();
         print(root, stringBuilder);
