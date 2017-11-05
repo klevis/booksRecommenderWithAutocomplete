@@ -47,6 +47,9 @@ public class StringSearchable implements ramo.klevis.ui.comp.Searchable {
     public Collection<String> search(String value) {
         List<Book> wordsStartingWith = trie.findWordsStartingWith(value.toLowerCase());
 
+        if (collaborationFiltering == null) {
+            return new ArrayList<>();
+        }
         List<Book> books = collaborationFiltering.predictBooks(wordsStartingWith);
 
         return books.stream().map(e -> e.getTitle() + " - " + e.getRating().intValue()).collect(Collectors.toList());

@@ -17,9 +17,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by klevis.ramo on 10/29/2017.
@@ -28,6 +26,7 @@ public class UI {
     private static final int FRAME_WIDTH = 698;
     private static final int FRAME_HEIGHT = 400;
     private static final int FEATURE_SIZE = 50;
+    private static final int DATA_SIZE = 100000;
 
     private JFrame mainFrame;
     private JPanel mainPanel;
@@ -40,13 +39,13 @@ public class UI {
     private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 14);
     private final Font sansSerifItalic = new Font("SansSerif", Font.ITALIC, 13);
     private StringSearchable searchable;
+    private JSpinner dataSizeField;
 
     public UI() throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
         UIManager.put("Table.font", new FontUIResource(new Font("Dialog", Font.ITALIC, 14)));
         UIManager.put("ProgressBar.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
-        prepareData = new PrepareData();
+        prepareData = new PrepareData(100000);
         initUI();
         collaborationFiltering = new CollaborationFiltering();
     }
@@ -78,15 +77,16 @@ public class UI {
         setPanelTitle(ratingScrollPane, "Tell the Algorithm What you like");
         tableAndComboPanel.add(ratingScrollPane, BorderLayout.CENTER);
 
-        ratingsTableModel.restAndAddNewMovies(bookList);
+        ratingsTableModel.resetAndAddNewMovies(bookList);
         ratingsTableModel.fireTableDataChanged();
 
         GridLayout gridLayout = new GridLayout(2, 1);
         JPanel panelSuggestion = new JPanel(gridLayout);
-        JLabel label = new JLabel("Find Books Starting With");
-        label.setFont(sansSerifBold);
+        JLabel label = new JLabel("Find Books Starting With(please rate and train first)");
+        label.setFont(sansSerifItalic);
+        label.setForeground(Color.BLUE);
         panelSuggestion.add(label);
-        searchable = new StringSearchable(prepareData.getBooks(),collaborationFiltering);
+        searchable = new StringSearchable(prepareData.getBooks(), collaborationFiltering);
         AutocompleteJComboBox combo = new AutocompleteJComboBox(searchable);
         panelSuggestion.add(combo);
         tableAndComboPanel.add(panelSuggestion, BorderLayout.NORTH);
@@ -104,22 +104,13 @@ public class UI {
     private void addTopPanel() throws IOException {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        JLabel genres = new JLabel("Genres");
-        genres.setFont(sansSerifBold);
-        topPanel.add(genres);
-
-        JButton reset = new JButton("Reset Ratings");
-        reset.addActionListener(e -> {
-            resetMoviesRate();
-        });
-        topPanel.add(reset);
-
-        JButton train = new JButton("Suggest Movies");
+        JButton train = new JButton("Train Algorithm with");
+        train.setFont(sansSerifBold);
         train.addActionListener(e -> {
             showProgressBar();
             Runnable runnable = () -> {
                 try {
-                    collaborationFiltering.train(prepareData.getBooks(), (Integer) featureField.getValue());
+                    collaborationFiltering.train(prepareData.getBooks(), (Integer) featureField.getValue(), prepareData.getRatings());
                     searchable.setCollaborationFiltering(collaborationFiltering);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
@@ -140,16 +131,29 @@ public class UI {
         featureField = new JSpinner(model);
         featureField.setFont(sansSerifBold);
         topPanel.add(featureField);
+
+
+        JButton reset = new JButton("Reset with Data Size");
+        reset.addActionListener(e -> {
+            resetBooksRate();
+        });
+        reset.setFont(sansSerifBold);
+        topPanel.add(reset);
+        model = new SpinnerNumberModel(DATA_SIZE, 100000, 2700000, 5000);
+        dataSizeField = new JSpinner(model);
+        dataSizeField.setFont(sansSerifBold);
+        topPanel.add(dataSizeField);
+
         mainPanel.add(topPanel, BorderLayout.NORTH);
     }
 
-    private void resetMoviesRate() {
+    private void resetBooksRate() {
         try {
-            prepareData = new PrepareData();
+            prepareData = new PrepareData((Integer) dataSizeField.getValue());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-        ratingsTableModel.restAndAddNewMovies(new ArrayList<>());
+        ratingsTableModel.resetAndAddNewMovies(prepareData.getBooks());
         ratingsTableModel.fireTableDataChanged();
     }
 

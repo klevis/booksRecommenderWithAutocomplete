@@ -61,7 +61,7 @@ public class RatingsTableModel extends AbstractTableModel {
         return value;
     }
 
-    public void restAndAddNewMovies(List<Book> newBooks) {
+    public void resetAndAddNewMovies(List<Book> newBooks) {
         bookList.clear();
         bookList.addAll(newBooks);
     }

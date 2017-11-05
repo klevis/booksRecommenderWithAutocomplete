@@ -25,12 +25,10 @@ public class CollaborationFiltering {
     private double mse;
     private MatrixFactorizationModel model;
 
-    public void train(List<Book> currentBooks, int featureSize) throws Exception {
+    public void train(List<Book> currentBooks, int featureSize,List<Rating> ratingsList) throws Exception {
         if (sparkContext == null) {
             sparkContext = createSparkContext();
         }
-        PrepareData prepareData = new PrepareData();
-        List<Rating> ratingsList = prepareData.getRatings();
         List<Rating> ratedByCurrentUser = currentBooks.stream().parallel().filter(e -> e.getRating() > 0d).map(e ->
                 new Rating(CURRENT_USER_ID, e.getId(), e.getRating())).collect(Collectors.toList());
         ratingsList.addAll(ratedByCurrentUser);

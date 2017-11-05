@@ -1,12 +1,10 @@
 package ramo.klevis.ml;
 
 import org.apache.spark.mllib.recommendation.Rating;
-import scala.tools.scalap.Classfile;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
@@ -25,11 +23,12 @@ public class PrepareData {
 
     private static final String ML_LATEST_SMALL_MOVIES_CSV = "data/books.csv";
     private static final String ML_LATEST_SMALL_RATINGS_CSV = "data/ratings.csv";
-    private static final int LIMIT_SIZE = 100000;
+    private final int limitSize;
     private final List<Book> books;
     private final List<Rating> ratings;
 
-    public PrepareData() throws Exception {
+    public PrepareData(int limitSize) throws Exception {
+        this.limitSize = limitSize;
         books = readAllBooks();
         ratings = readUserRatings();
     }
@@ -40,7 +39,7 @@ public class PrepareData {
 
     public List<Book> readAllBooks() throws Exception {
         return Files.readAllLines(getPath(ML_LATEST_SMALL_MOVIES_CSV), StandardCharsets.ISO_8859_1)
-                .stream().parallel().skip(1).limit(LIMIT_SIZE).map(line -> {
+                .stream().parallel().skip(1).limit(limitSize).map(line -> {
                     String[] values = line.split(";");
                     int id = 0;
                     try {
@@ -55,7 +54,7 @@ public class PrepareData {
     public List<Rating> readUserRatings() throws Exception {
         final int[] count = {0};
         List<Rating> collect = Files.readAllLines(getPath(ML_LATEST_SMALL_RATINGS_CSV), StandardCharsets.ISO_8859_1)
-                .stream().parallel().skip(1).limit(LIMIT_SIZE).map(line -> {
+                .stream().parallel().skip(1).limit(limitSize).map(line -> {
                     String[] values = line.split(";");
 
                     int product;
