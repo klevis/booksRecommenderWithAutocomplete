@@ -25,7 +25,7 @@ public class PrepareData {
 
     private static final String ML_LATEST_SMALL_MOVIES_CSV = "data/books.csv";
     private static final String ML_LATEST_SMALL_RATINGS_CSV = "data/ratings.csv";
-    private static final int LIMIT_SIZE = 500000;
+    private static final int LIMIT_SIZE = 100000;
     private final List<Book> books;
     private final List<Rating> ratings;
 

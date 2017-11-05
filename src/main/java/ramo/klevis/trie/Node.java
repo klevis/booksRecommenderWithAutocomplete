@@ -1,7 +1,6 @@
 package ramo.klevis.trie;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,14 +8,14 @@ import java.util.Map;
 /**
  * Created by klevis.ramo on 11/5/2017.
  */
-public class Node {
+public class Node<T> {
 
     private Character character;
 
     //keep order is easier to test
     private Map<Character, Node> children = new LinkedHashMap<>();
 
-    List<String> words = new ArrayList<>();
+    List<T> words = new ArrayList<>();
 
     public Node() {
     }
@@ -38,11 +37,11 @@ public class Node {
         return false;
     }
 
-    public List<String> getWords() {
+    public List<T> getWords() {
         return new ArrayList<>(words);
     }
 
-    public void addWord(String word) {
+    public void addWord(T word) {
         words.add(word);
     }
 }

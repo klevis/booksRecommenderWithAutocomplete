@@ -23,8 +23,9 @@ public class CollaborationFiltering {
     private static final int CURRENT_USER_ID = 9999999;
     private JavaSparkContext sparkContext;
     private double mse;
+    private MatrixFactorizationModel model;
 
-    public List<Book> train(List<Book> currentBooks, int featureSize) throws Exception {
+    public void train(List<Book> currentBooks, int featureSize) throws Exception {
         if (sparkContext == null) {
             sparkContext = createSparkContext();
         }
@@ -37,7 +38,7 @@ public class CollaborationFiltering {
         JavaRDD<Rating> ratings = sparkContext.parallelize(ratingsList);
         int rank = featureSize;
         int numIterations = 10;
-        MatrixFactorizationModel model = ALS.train(JavaRDD.toRDD(ratings), rank, numIterations, 0.01);
+        model = ALS.train(JavaRDD.toRDD(ratings), rank, numIterations, 0.01);
 
         JavaRDD<Tuple2<Object, Object>> userProducts =
                 ratings.map(r -> new Tuple2<>(r.user(), r.product()));
@@ -55,24 +56,25 @@ public class CollaborationFiltering {
             return err * err;
         }).mean();
         System.out.println("Mean Squared Error = " + mse);
+    }
 
-        List<Book> notRatedBooks = currentBooks.stream().parallel().filter(e -> e.getRating() == 0d).collect(Collectors.toList());
-
-        JavaRDD<Tuple2<Object, Object>> map = sparkContext.parallelize(notRatedBooks).map(r -> new Tuple2<>(CURRENT_USER_ID, r.getId()));
+    public List<Book> predictBooks(List<Book> currentBooks) {
+        JavaRDD<Tuple2<Object, Object>> map = sparkContext.parallelize(currentBooks).map(r -> new Tuple2<>(CURRENT_USER_ID, r.getId()));
         List<Rating> predicted = model.predict(JavaRDD.toRDD(map)).toJavaRDD().collect().stream().parallel().sorted(Comparator.comparing(Rating::rating).reversed()).collect(Collectors.toList());
 
-        Map<Integer, Book> notRatedMoviesMap = notRatedBooks.stream().parallel().collect(Collectors.toMap(Book::getId, movie -> movie));
+        Map<Integer, Book> notRatedMoviesMap = currentBooks.stream().parallel().collect(Collectors.toMap(Book::getId, book -> book));
 
-        List<Book> topTen = new ArrayList<>();
-        for (int i = 0; i < 30 && !predicted.isEmpty(); i++) {
-
-            Book book = notRatedMoviesMap.get("" + predicted.get(i).product());
-            book.setRating(predicted.get(i).rating());
-            topTen.add(book);
+        ArrayList<Book> topBooks = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            if (i + 1 > predicted.size()) {
+                break;
+            }
+            Rating rating = predicted.get(i);
+            Book book = notRatedMoviesMap.get(rating.product());
+            book.setRating(rating.rating());
+            topBooks.add(book);
         }
-
-        return topTen;
-
+        return topBooks;
     }
 
     private JavaSparkContext createSparkContext() {

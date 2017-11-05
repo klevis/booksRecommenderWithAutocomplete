@@ -27,7 +27,7 @@ public class AutocompleteJComboBox extends JComboBox {
     static final long serialVersionUID = 4321421L;
 
 
-    private final Searchable<String, String> searchable;
+    private final Searchable searchable;
 
 
     /**
@@ -36,7 +36,7 @@ public class AutocompleteJComboBox extends JComboBox {
      * @param s
      */
 
-    public AutocompleteJComboBox(Searchable<String, String> s) {
+    public AutocompleteJComboBox(Searchable s) {
 
         super();
 
@@ -101,10 +101,6 @@ public class AutocompleteJComboBox extends JComboBox {
                                 foundSet.add(s.toLowerCase());
 
                             }
-
-                            Collections.sort(founds);//sort alphabetically
-
-
                             setEditable(false);
 
                             removeAllItems();

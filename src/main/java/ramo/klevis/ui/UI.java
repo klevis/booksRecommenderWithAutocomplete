@@ -39,6 +39,7 @@ public class UI {
     private JSpinner featureField;
     private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 14);
     private final Font sansSerifItalic = new Font("SansSerif", Font.ITALIC, 13);
+    private StringSearchable searchable;
 
     public UI() throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -55,7 +56,7 @@ public class UI {
         mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
-        addMovieTables();
+        addBookTableAndAutocomplete();
         addTopPanel();
         addSignature();
 
@@ -63,7 +64,7 @@ public class UI {
         mainFrame.setVisible(true);
     }
 
-    private void addMovieTables() throws InvocationTargetException, InterruptedException {
+    private void addBookTableAndAutocomplete() throws InvocationTargetException, InterruptedException {
         List<Book> bookList = prepareData.getBooks();
         ratingsTableModel = new RatingsTableModel();
         table = new JTable(ratingsTableModel);
@@ -85,12 +86,11 @@ public class UI {
         JLabel label = new JLabel("Find Books Starting With");
         label.setFont(sansSerifBold);
         panelSuggestion.add(label);
-        StringSearchable searchable = new StringSearchable(prepareData.getBooks().stream().limit(1000).map(e->e.getTitle()).collect(Collectors.toList()));
+        searchable = new StringSearchable(prepareData.getBooks(),collaborationFiltering);
         AutocompleteJComboBox combo = new AutocompleteJComboBox(searchable);
         panelSuggestion.add(combo);
         tableAndComboPanel.add(panelSuggestion, BorderLayout.NORTH);
         mainPanel.add(tableAndComboPanel, BorderLayout.CENTER);
-
 
     }
 
@@ -119,7 +119,8 @@ public class UI {
             showProgressBar();
             Runnable runnable = () -> {
                 try {
-                    List<Book> topTenRated = collaborationFiltering.train(prepareData.getBooks(), (Integer) featureField.getValue());
+                    collaborationFiltering.train(prepareData.getBooks(), (Integer) featureField.getValue());
+                    searchable.setCollaborationFiltering(collaborationFiltering);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 } finally {

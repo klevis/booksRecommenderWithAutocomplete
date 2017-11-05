@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by klevis.ramo on 11/5/2017.
  */
-public class Trie {
+public class Trie<T> {
 
     private Root root = new Root();
 
@@ -15,17 +15,20 @@ public class Trie {
     }
 
     public void insert(String word) {
+        insert(word, (T) word);
+    }
 
+    public void insert(String word, T object) {
         char[] chars = word.toCharArray();
         Node startFrom = root;
         for (char aChar : chars) {
             Node found = insert(aChar, startFrom, word);
             startFrom = found;
-            startFrom.addWord(word);
+            startFrom.addWord(object);
         }
     }
 
-    private Node insert(char currentChar, Node startFrom, String word) {
+    private Node insert(char currentChar, Node<T> startFrom, String word) {
         Node node = startFrom.getChildren().get(currentChar);
         if (node == null) {
             Node newNode = new Node(currentChar);
@@ -35,10 +38,10 @@ public class Trie {
         return node;
     }
 
-    public List<String> findWordsStartingWith(String prefix) {
+    public List<T> findWordsStartingWith(String prefix) {
 
         char[] chars = prefix.toCharArray();
-        Node current=root;
+        Node<T> current = root;
         for (char currentChar : chars) {
             Node node = current.getChildren().get(currentChar);
             if (node == null) {
