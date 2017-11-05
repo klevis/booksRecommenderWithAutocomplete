@@ -39,7 +39,7 @@ public class PrepareData {
 
     public List<Book> readAllBooks() throws Exception {
         return Files.readAllLines(getPath(ML_LATEST_SMALL_MOVIES_CSV), StandardCharsets.ISO_8859_1)
-                .stream().parallel().skip(1).limit(limitSize).map(line -> {
+                .stream().parallel().skip(1).map(line -> {
                     String[] values = line.split(";");
                     int id = 0;
                     try {

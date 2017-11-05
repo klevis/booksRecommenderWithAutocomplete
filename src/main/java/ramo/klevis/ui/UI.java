@@ -110,7 +110,7 @@ public class UI {
         });
         reset.setFont(sansSerifBold);
         topPanel.add(reset);
-        SpinnerModel model = new SpinnerNumberModel(DATA_SIZE, 100000, 278000, 5000);
+        SpinnerModel model = new SpinnerNumberModel(DATA_SIZE, 100000, 1149000, 5000);
         dataSizeField = new JSpinner(model);
         dataSizeField.setFont(sansSerifBold);
         topPanel.add(dataSizeField);
