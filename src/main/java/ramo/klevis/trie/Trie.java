@@ -16,28 +16,31 @@ public class Trie<T> {
 
     /**
      * Suggestion word is default same as the word.
-     * @param word that will be search char by char
+     *
+     * @param sentence that will be search char by char
      */
-    public void insert(String word) {
-        insert(word, (T) word);
+    public void insert(String sentence) {
+        insert(sentence, (T) sentence);
     }
 
     /**
-     *
-     * @param word that will be search char by char
+     * @param sentence             that will be search char by char
      * @param suggestionObject what is suggested to user
      */
-    public void insert(String word, T suggestionObject) {
-        char[] chars = word.toCharArray();
-        Node startFrom = root;
-        for (char aChar : chars) {
-            Node found = insert(aChar, startFrom, word);
-            startFrom = found;
-            startFrom.addSuggestionObject(suggestionObject);
+    public void insert(String sentence, T suggestionObject) {
+        String[] split = sentence.split(" ");
+        for (String word : split) {
+            char[] chars = word.toCharArray();
+            Node startFrom = root;
+            for (char aChar : chars) {
+                Node found = insert(aChar, startFrom);
+                startFrom = found;
+                startFrom.addSuggestionObject(suggestionObject);
+            }
         }
     }
 
-    private Node insert(char currentChar, Node<T> startFrom, String word) {
+    private Node insert(char currentChar, Node<T> startFrom) {
         Node node = startFrom.getChildren().get(currentChar);
         if (node == null) {
             Node newNode = new Node(currentChar);

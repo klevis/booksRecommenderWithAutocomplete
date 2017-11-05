@@ -60,6 +60,23 @@ public class TrieTest {
         assertThat(words.size(),Is.is(3));
     }
 
+    @Test
+    public void shouldSearchEachWordOnSentenceButSuggestAllSentence() {
+        Trie trie = new Trie();
+        trie.insert("bla ted bla ");
+        trie.insert("blu ten blu xxc");
+        trie.insert("xxc teddy");
+        trie.insert("ty great ga");
+        trie.insert("aaaa movie zzzzz");
+        trie.insert("zzz moon d g ");
+
+        List<String> words=trie.findWordsStartingWith("te");
+        assertThat(words.get(0),Is.is("bla ted bla "));
+        assertThat(words.get(1),Is.is("blu ten blu xxc"));
+        assertThat(words.get(2),Is.is("xxc teddy"));
+        assertThat(words.size(),Is.is(3));
+    }
+
     private String print(Root root) {
         StringBuilder stringBuilder = new StringBuilder();
         print(root, stringBuilder);
