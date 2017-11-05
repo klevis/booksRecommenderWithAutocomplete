@@ -168,7 +168,7 @@ public class UI {
                 System.exit(0);
             }
         });
-        ImageIcon imageIcon = new ImageIcon("video.png");
+        ImageIcon imageIcon = new ImageIcon("icon.png");
         mainFrame.setIconImage(imageIcon.getImage());
 
         return mainFrame;
