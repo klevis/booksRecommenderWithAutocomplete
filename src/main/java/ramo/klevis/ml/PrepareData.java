@@ -43,8 +43,9 @@ public class PrepareData {
                     String[] values = line.split(";");
                     int id;
                     try {
-                        id = Integer.parseInt(values[0].replaceAll("\"", "").replaceAll("X", "9").replaceAll("x", "8"));
+                        id = Integer.parseInt(values[0].replaceAll("\"", ""));
                     } catch (NumberFormatException e) {
+                        //MLib does not accept id strings
                         return null;
                     }
                     return new Book(id, values[1].replaceAll("\"", ""), 0d);
@@ -52,16 +53,15 @@ public class PrepareData {
     }
 
     public List<Rating> readUserRatings() throws Exception {
-        final int[] count = {0};
         List<Rating> collect = Files.readAllLines(getPath(ML_LATEST_SMALL_RATINGS_CSV), StandardCharsets.ISO_8859_1)
                 .stream().parallel().skip(1).limit(limitSize).map(line -> {
                     String[] values = line.split(";");
 
                     int product;
                     try {
-                        product = Integer.parseInt(values[1].replaceAll("\"", "").replaceAll("X", "9").replaceAll("x", "8"));
+                        product = Integer.parseInt(values[1].replaceAll("\"", ""));
                     } catch (NumberFormatException e) {
-                        count[0]++;
+                        //MLib does not accept id strings
                         return null;
                     }
                     return new Rating(Integer.parseInt(values[0].replaceAll("\"", "")),
@@ -69,7 +69,6 @@ public class PrepareData {
                             Double.parseDouble(values[2].replaceAll("\"", "")));
                 }).filter(e -> e != null).collect(Collectors.toList());
 
-        System.out.println(count[0]);
         System.out.println(collect.size());
         return collect;
     }
