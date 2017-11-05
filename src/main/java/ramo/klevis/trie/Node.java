@@ -15,7 +15,7 @@ public class Node<T> {
     //keep order is easier to test
     private Map<Character, Node> children = new LinkedHashMap<>();
 
-    List<T> words = new ArrayList<>();
+    List<T> suggestionObject = new ArrayList<>();
 
     public Node() {
     }
@@ -37,11 +37,11 @@ public class Node<T> {
         return false;
     }
 
-    public List<T> getWords() {
-        return new ArrayList<>(words);
+    public List<T> getSuggestionObject() {
+        return new ArrayList<>(suggestionObject);
     }
 
-    public void addWord(T word) {
-        words.add(word);
+    public void addSuggestionObject(T word) {
+        suggestionObject.add(word);
     }
 }
