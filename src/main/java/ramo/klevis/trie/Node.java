@@ -1,10 +1,11 @@
 package ramo.klevis.trie;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by klevis.ramo on 11/5/2017.
@@ -16,7 +17,7 @@ public class Node<T> {
     //keep order is easier to test
     private Map<Character, Node> children = new LinkedHashMap<>();
 
-    Map<T, T> suggestionObject = new HashMap<T, T>();
+    Set<T> suggestionObject = new HashSet<T>();
 
     public Node() {
     }
@@ -39,12 +40,10 @@ public class Node<T> {
     }
 
     public List<T> getSuggestionObject() {
-        return new ArrayList<>(suggestionObject.values());
+        return new ArrayList<>(suggestionObject);
     }
 
     public void addSuggestionObject(T word) {
-        if (!suggestionObject.containsKey(word)) {
-            suggestionObject.put(word, word);
-        }
+        suggestionObject.add(word);
     }
 }

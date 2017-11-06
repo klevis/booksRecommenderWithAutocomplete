@@ -23,8 +23,8 @@ import java.util.List;
  * Created by klevis.ramo on 10/29/2017.
  */
 public class UI {
-    private static final int FRAME_WIDTH = 698;
-    private static final int FRAME_HEIGHT = 400;
+    private static final int FRAME_WIDTH = 1200;
+    private static final int FRAME_HEIGHT = 628;
     private static final int FEATURE_SIZE = 50;
     private static final int DATA_SIZE = 100000;
 
