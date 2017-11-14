@@ -69,7 +69,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>ramo.klevis.ml.emailspam.Run</mainClass>
+                    <mainClass>ramo.klevis.Run</mainClass>
                 </configuration>
             </plugin>
             <plugin>
